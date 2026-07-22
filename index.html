@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PWA Theme Color -->
+  <meta name="theme-color" content="#2563eb">
   <title>Gmail Management Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +24,10 @@
       <h1 class="text-xl font-bold flex items-center gap-2">
         📬 Gmail Manager
       </h1>
-      <span class="text-xs bg-blue-700 px-2.5 py-1 rounded-full font-medium">Dashboard</span>
+      <!-- PWA Install Button (App-এ না থাকলে স্বয়ংক্রিয়ভাবে দেখাবে) -->
+      <button id="pwa-install-btn" class="hidden text-xs bg-white text-blue-600 px-3 py-1.5 rounded-lg font-bold shadow hover:bg-slate-100 transition active:scale-95 flex items-center gap-1">
+        📲 Install App
+      </button>
     </div>
   </header>
 
@@ -122,33 +127,33 @@
     <p>&copy; Gmail Manager App. All rights reserved.</p>
   </footer>
 
-  <!-- JavaScript for Name Generation & Copy Logic -->
+  <!-- JavaScript Section -->
   <script>
-    // Local Name Database (Bangladesh, USA, UK, Canada, Australia, Germany)
+    // Name Database
     const nameData = {
       bd: {
-        male: ["Md. Rakib Hasan", "Md. Tanvir Hossain", "Md. Arifur Rahman", "Md. Shakil Ahmed", "Md. Sabbir Hossain", "Md. Mehedi Hasan", "Md. Naimur Rahman", "Md. Al-Amin", "Md. Sohel Rana", "Md. Imran Hossain", "Md. Rayhan Ahmed", "Md. Fahim Hossain", "Md. Mahmudul Hasan", "Md. Kawsar Ahmed", "Md. Ashraful Islam"],
-        female: ["Mst. Nusrat Jahan", "Mst. Sharmin Akter", "Mst. Sadia Islam", "Mst. Tanjila Akter", "Mst. Jannatul Ferdous", "Mst. Sumaiya Akter", "Mst. Riya Sultana", "Mst. Farzana Akter", "Mst. Mim Akter", "Mst. Sabrina Islam", "Mst. Afrin Sultana", "Mst. Tahmina Akter", "Mst. Umme Habiba", "Mst. Nilufa Yasmin", "Mst. Rubaiya Islam"]
+        male: ["Md. Rakib Hasan", "Md. Tanvir Hossain", "Md. Arifur Rahman", "Md. Shakil Ahmed", "Md. Sabbir Hossain", "Md. Mehedi Hasan", "Md. Naimur Rahman", "Md. Al-Amin", "Md. Sohel Rana", "Md. Imran Hossain"],
+        female: ["Mst. Nusrat Jahan", "Mst. Sharmin Akter", "Mst. Sadia Islam", "Mst. Tanjila Akter", "Mst. Jannatul Ferdous", "Mst. Sumaiya Akter", "Mst. Riya Sultana", "Mst. Farzana Akter"]
       },
       us: {
-        male: ["James Smith", "John Johnson", "Robert Williams", "Michael Brown", "David Jones", "William Garcia", "Richard Miller", "Joseph Rodriguez", "Thomas Martinez", "Charles Hernandez", "Christopher Young", "Daniel King", "Matthew Wright", "Anthony Lopez", "Mark Hill"],
-        female: ["Mary Smith", "Patricia Johnson", "Jennifer Williams", "Linda Brown", "Elizabeth Jones", "Barbara Garcia", "Susan Miller", "Jessica Rodriguez", "Sarah Martinez", "Karen Hernandez", "Emily Taylor", "Ashley Anderson", "Samantha Thomas", "Amanda Jackson", "Melissa White"]
+        male: ["James Smith", "John Johnson", "Robert Williams", "Michael Brown", "David Jones", "William Garcia", "Richard Miller"],
+        female: ["Mary Smith", "Patricia Johnson", "Jennifer Williams", "Linda Brown", "Elizabeth Jones", "Barbara Garcia"]
       },
       uk: {
-        male: ["Oliver Davies", "George Evans", "Harry Taylor", "Noah Thomas", "Jack Roberts", "Leo Walker", "Arthur Wright", "Muhammad Robinson", "Oscar Thompson", "Charlie White", "Jacob Hughes", "Freddie Edwards", "Alfian Green", "Archie Lewis", "Henry Wood"],
-        female: ["Olivia Davies", "Amelia Evans", "Isla Taylor", "Ava Thomas", "Mia Roberts", "Ivy Walker", "Lily Wright", "Freya Robinson", "Florence Thompson", "Evie White", "Ella Hughes", "Poppy Edwards", "Charlotte Green", "Grace Lewis", "Phoebe Wood"]
+        male: ["Oliver Davies", "George Evans", "Harry Taylor", "Noah Thomas", "Jack Roberts"],
+        female: ["Olivia Davies", "Amelia Evans", "Isla Taylor", "Ava Thomas", "Mia Roberts"]
       },
       ca: {
-        male: ["Liam Tremblay", "Jackson Roy", "Lucas Gagnon", "Noah Lee", "Ethan Smith", "Logan Bouchard", "Benjamin Gauthier", "William Morin", "James Lavoie", "Alexander Fortin", "Oliver Cote", "Jacob Pelletier", "Lucas Belanger", "Mason Levesque", "Jack Martin"],
-        female: ["Emma Tremblay", "Olivia Roy", "Charlotte Gagnon", "Sophia Lee", "Ava Smith", "Chloe Bouchard", "Ella Gauthier", "Amelia Morin", "Mila Lavoie", "Maya Fortin", "Lily Cote", "Zoey Pelletier", "Hannah Belanger", "Nora Levesque", "Isla Martin"]
+        male: ["Liam Tremblay", "Jackson Roy", "Lucas Gagnon", "Noah Lee"],
+        female: ["Emma Tremblay", "Olivia Roy", "Charlotte Gagnon", "Sophia Lee"]
       },
       au: {
-        male: ["Oliver Smith", "Noah Jones", "Jack Williams", "William Brown", "Leo Wilson", "Lucas Taylor", "Henry Johnson", "Thomas Martin", "Charlie Anderson", "Jackson White", "Mason Thompson", "Ethan Thomas", "James Walker", "Alexander Harris", "Liam Ryan"],
-        female: ["Charlotte Smith", "Amelia Jones", "Isla Williams", "Olivia Brown", "Mia Wilson", "Ava Taylor", "Grace Johnson", "Willow Martin", "Harper Anderson", "Lily White", "Evie Thompson", "Ella Thomas", "Sophia Walker", "Ruby Harris", "Ivy Ryan"]
+        male: ["Oliver Smith", "Noah Jones", "Jack Williams", "William Brown"],
+        female: ["Charlotte Smith", "Amelia Jones", "Isla Williams", "Olivia Brown"]
       },
       de: {
-        male: ["Noah Müller", "Matteo Schmidt", "Leon Schneider", "Finn Fischer", "Elias Weber", "Paul Meyer", "Louis Wagner", "Ben Becker", "Luca Schulz", "Emil Hoffmann", "Felix Schäfer", "Maximilian Koch", "Henry Bauer", "Lukas Richter", "Theo Klein"],
-        female: ["Mia Müller", "Emilia Schmidt", "Sophia Schneider", "Hannah Fischer", "Emma Weber", "Lina Meyer", "Mila Wagner", "Ella Becker", "Clara Schulz", "Maria Hoffmann", "Lea Schäfer", "Luisa Koch", "Johanna Bauer", "Leni Richter", "Nele Klein"]
+        male: ["Noah Müller", "Matteo Schmidt", "Leon Schneider", "Finn Fischer"],
+        female: ["Mia Müller", "Emilia Schmidt", "Sophia Schneider", "Hannah Fischer"]
       }
     };
 
@@ -161,7 +166,6 @@
     const copyNameBtn = document.getElementById('copy-name-btn');
     const toast = document.getElementById('toast');
 
-    // Toast Function
     function showToast(msg) {
       toast.innerText = msg;
       toast.classList.remove('opacity-0');
@@ -172,11 +176,9 @@
       }, 2500);
     }
 
-    // Generate Random Name
     genBtn.addEventListener('click', () => {
       const country = countrySelect.value;
       const gender = genderSelect.value;
-      
       const list = nameData[country][gender];
       const randomName = list[Math.floor(Math.random() * list.length)];
 
@@ -185,7 +187,6 @@
       nameBox.classList.remove('hidden');
     });
 
-    // Copy Generated Name
     copyNameBtn.addEventListener('click', () => {
       const name = generatedName.innerText;
       if (name) {
@@ -193,6 +194,36 @@
           showToast('📋 Name Copied!');
         });
       }
+    });
+
+    // ==========================================
+    // PWA Logic & Service Worker Registration
+    // ==========================================
+    let deferredPrompt;
+    const installBtn = document.getElementById('pwa-install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Browser automatic prompt hide করে বাটনে অপশন দেওয়া
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.classList.remove('hidden'); // Install বাটন দৃশ্যমান করবে
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        }
+        deferredPrompt = null;
+        installBtn.classList.add('hidden');
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.classList.add('hidden');
+      console.log('PWA was installed successfully!');
     });
 
     // Register Service Worker
