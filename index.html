@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail Management Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+  <!-- Header Section -->
+  <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold flex items-center gap-2">
+        📬 Gmail Manager
+      </h1>
+      <span class="text-xs bg-blue-700 px-2.5 py-1 rounded-full font-medium">Dashboard</span>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-md mx-auto w-full px-4 py-6 flex-grow space-y-6">
+    
+    <!-- Welcome Text -->
+    <div class="text-center">
+      <h2 class="text-2xl font-bold text-slate-800">Welcome Back!</h2>
+      <p class="text-sm text-slate-500 mt-1">Select a module or generate quick names</p>
+    </div>
+
+    <!-- Navigation Cards Grid -->
+    <div class="grid grid-cols-2 gap-3">
+
+      <!-- Card 1: My Gmail -->
+      <a href="my-gmail.html" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition group flex flex-col justify-between">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition mb-3">
+          👤
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-800 group-hover:text-blue-600 transition">My Gmail</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Personal accounts</p>
+        </div>
+      </a>
+
+      <!-- Card 2: Sale Gmail -->
+      <a href="sale-gmail.html" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition group flex flex-col justify-between">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl group-hover:scale-110 transition mb-3">
+          💼
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-800 group-hover:text-emerald-600 transition">Sale Gmail</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Accounts for sale</p>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Section 3: Name Generator Widget -->
+    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          🌐 Name Generator
+        </h3>
+        <span class="text-xs text-slate-400">Quick Tools</span>
+      </div>
+
+      <!-- Controls: Country & Gender -->
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Country</label>
+          <select id="country-select" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+            <option value="bd">🇧🇩 Bangladesh</option>
+            <option value="us">🇺🇸 USA</option>
+            <option value="uk">🇬🇧 UK</option>
+            <option value="ca">🇨🇦 Canada</option>
+            <option value="au">🇦🇺 Australia</option>
+            <option value="de">🇩🇪 Germany</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Gender</label>
+          <select id="gender-select" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+            <option value="male">👨 Male</option>
+            <option value="female">👩 Female</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Generate Button -->
+      <button id="gen-btn" class="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-xl hover:bg-blue-700 active:scale-95 transition text-sm flex justify-center items-center gap-2">
+        🎲 Generate Name
+      </button>
+
+      <!-- Output Display Box -->
+      <div id="name-box" class="hidden bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+        <div>
+          <p id="generated-name" class="font-semibold text-slate-800 text-sm select-all"></p>
+          <p id="name-meta" class="text-xs text-slate-400 capitalize"></p>
+        </div>
+        <button id="copy-name-btn" class="bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded-lg text-xs hover:bg-blue-100 active:scale-95 transition">
+          📋 Copy
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-5 py-2.5 rounded-full text-xs shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 font-medium">
+    Copied!
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 text-xs text-slate-400">
+    <p>&copy; Gmail Manager App. All rights reserved.</p>
+  </footer>
+
+  <!-- JavaScript for Name Generation & Copy Logic -->
+  <script>
+    // Local Name Database (Bangladesh, USA, UK, Canada, Australia, Germany)
+    const nameData = {
+      bd: {
+        male: ["Md. Rakib Hasan", "Md. Tanvir Hossain", "Md. Arifur Rahman", "Md. Shakil Ahmed", "Md. Sabbir Hossain", "Md. Mehedi Hasan", "Md. Naimur Rahman", "Md. Al-Amin", "Md. Sohel Rana", "Md. Imran Hossain", "Md. Rayhan Ahmed", "Md. Fahim Hossain", "Md. Mahmudul Hasan", "Md. Kawsar Ahmed", "Md. Ashraful Islam"],
+        female: ["Mst. Nusrat Jahan", "Mst. Sharmin Akter", "Mst. Sadia Islam", "Mst. Tanjila Akter", "Mst. Jannatul Ferdous", "Mst. Sumaiya Akter", "Mst. Riya Sultana", "Mst. Farzana Akter", "Mst. Mim Akter", "Mst. Sabrina Islam", "Mst. Afrin Sultana", "Mst. Tahmina Akter", "Mst. Umme Habiba", "Mst. Nilufa Yasmin", "Mst. Rubaiya Islam"]
+      },
+      us: {
+        male: ["James Smith", "John Johnson", "Robert Williams", "Michael Brown", "David Jones", "William Garcia", "Richard Miller", "Joseph Rodriguez", "Thomas Martinez", "Charles Hernandez", "Christopher Young", "Daniel King", "Matthew Wright", "Anthony Lopez", "Mark Hill"],
+        female: ["Mary Smith", "Patricia Johnson", "Jennifer Williams", "Linda Brown", "Elizabeth Jones", "Barbara Garcia", "Susan Miller", "Jessica Rodriguez", "Sarah Martinez", "Karen Hernandez", "Emily Taylor", "Ashley Anderson", "Samantha Thomas", "Amanda Jackson", "Melissa White"]
+      },
+      uk: {
+        male: ["Oliver Davies", "George Evans", "Harry Taylor", "Noah Thomas", "Jack Roberts", "Leo Walker", "Arthur Wright", "Muhammad Robinson", "Oscar Thompson", "Charlie White", "Jacob Hughes", "Freddie Edwards", "Alfian Green", "Archie Lewis", "Henry Wood"],
+        female: ["Olivia Davies", "Amelia Evans", "Isla Taylor", "Ava Thomas", "Mia Roberts", "Ivy Walker", "Lily Wright", "Freya Robinson", "Florence Thompson", "Evie White", "Ella Hughes", "Poppy Edwards", "Charlotte Green", "Grace Lewis", "Phoebe Wood"]
+      },
+      ca: {
+        male: ["Liam Tremblay", "Jackson Roy", "Lucas Gagnon", "Noah Lee", "Ethan Smith", "Logan Bouchard", "Benjamin Gauthier", "William Morin", "James Lavoie", "Alexander Fortin", "Oliver Cote", "Jacob Pelletier", "Lucas Belanger", "Mason Levesque", "Jack Martin"],
+        female: ["Emma Tremblay", "Olivia Roy", "Charlotte Gagnon", "Sophia Lee", "Ava Smith", "Chloe Bouchard", "Ella Gauthier", "Amelia Morin", "Mila Lavoie", "Maya Fortin", "Lily Cote", "Zoey Pelletier", "Hannah Belanger", "Nora Levesque", "Isla Martin"]
+      },
+      au: {
+        male: ["Oliver Smith", "Noah Jones", "Jack Williams", "William Brown", "Leo Wilson", "Lucas Taylor", "Henry Johnson", "Thomas Martin", "Charlie Anderson", "Jackson White", "Mason Thompson", "Ethan Thomas", "James Walker", "Alexander Harris", "Liam Ryan"],
+        female: ["Charlotte Smith", "Amelia Jones", "Isla Williams", "Olivia Brown", "Mia Wilson", "Ava Taylor", "Grace Johnson", "Willow Martin", "Harper Anderson", "Lily White", "Evie Thompson", "Ella Thomas", "Sophia Walker", "Ruby Harris", "Ivy Ryan"]
+      },
+      de: {
+        male: ["Noah Müller", "Matteo Schmidt", "Leon Schneider", "Finn Fischer", "Elias Weber", "Paul Meyer", "Louis Wagner", "Ben Becker", "Luca Schulz", "Emil Hoffmann", "Felix Schäfer", "Maximilian Koch", "Henry Bauer", "Lukas Richter", "Theo Klein"],
+        female: ["Mia Müller", "Emilia Schmidt", "Sophia Schneider", "Hannah Fischer", "Emma Weber", "Lina Meyer", "Mila Wagner", "Ella Becker", "Clara Schulz", "Maria Hoffmann", "Lea Schäfer", "Luisa Koch", "Johanna Bauer", "Leni Richter", "Nele Klein"]
+      }
+    };
+
+    const countrySelect = document.getElementById('country-select');
+    const genderSelect = document.getElementById('gender-select');
+    const genBtn = document.getElementById('gen-btn');
+    const nameBox = document.getElementById('name-box');
+    const generatedName = document.getElementById('generated-name');
+    const nameMeta = document.getElementById('name-meta');
+    const copyNameBtn = document.getElementById('copy-name-btn');
+    const toast = document.getElementById('toast');
+
+    // Toast Function
+    function showToast(msg) {
+      toast.innerText = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2500);
+    }
+
+    // Generate Random Name
+    genBtn.addEventListener('click', () => {
+      const country = countrySelect.value;
+      const gender = genderSelect.value;
+      
+      const list = nameData[country][gender];
+      const randomName = list[Math.floor(Math.random() * list.length)];
+
+      generatedName.innerText = randomName;
+      nameMeta.innerText = `${country.toUpperCase()} • ${gender}`;
+      nameBox.classList.remove('hidden');
+    });
+
+    // Copy Generated Name
+    copyNameBtn.addEventListener('click', () => {
+      const name = generatedName.innerText;
+      if (name) {
+        navigator.clipboard.writeText(name).then(() => {
+          showToast('📋 Name Copied!');
+        });
+      }
+    });
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW Registered!', reg))
+          .catch(err => console.log('SW Failed', err));
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail Accounts Manager</title>
+  <!-- Tailwind CSS CDN for modern design -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- PWA Manifest Link -->
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+  <!-- Navigation Bar -->
+  <nav class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-lg font-bold flex items-center gap-2">
+        📬 Gmail Keeper
+      </h1>
+      <div class="flex gap-2">
+        <button id="nav-add" class="px-3 py-1.5 bg-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-800 transition">Add New</button>
+        <button id="nav-history" class="px-3 py-1.5 bg-blue-500 rounded-lg text-sm font-semibold hover:bg-blue-400 transition">History</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container (Mobile Friendly) -->
+  <main class="max-w-md mx-auto p-4 mb-20">
+
+    <!-- Section 1: Add Account Form -->
+    <section id="section-add" class="block bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      <h2 class="text-xl font-bold mb-4 text-slate-800">Add New Gmail Account</h2>
+      <form id="gmail-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">Gmail Address <span class="text-red-500">*</span></label>
+          <input type="email" id="acc-email" placeholder="example@gmail.com" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">Password <span class="text-red-500">*</span></label>
+          <input type="text" id="acc-password" placeholder="Enter Password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">Recovery Email <span class="text-slate-400 font-normal">(Optional)</span></label>
+          <input type="email" id="acc-recovery" placeholder="recovery@example.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">Phone Number <span class="text-slate-400 font-normal">(Optional)</span></label>
+          <input type="tel" id="acc-phone" placeholder="Enter Phone" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <button type="submit" id="submit-btn" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-700 transition active:scale-95 flex justify-center items-center gap-2">
+          Save Account
+        </button>
+      </form>
+    </section>
+
+    <!-- Section 2: History List -->
+    <section id="section-history" class="hidden space-y-4">
+      <h2 class="text-xl font-bold text-slate-800 mb-2">Saved Accounts List</h2>
+      
+      <!-- Search Box inside History -->
+      <input type="text" id="search-bar" placeholder="Search by email or recovery..." class="w-full px-4 py-2 rounded-xl border border-slate-200 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      
+      <div id="loading-spinner" class="text-center py-8 text-slate-400">Loading your accounts...</div>
+      <div id="accounts-list" class="space-y-4">
+        <!-- Accounts will be loaded here dynamically -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-full text-sm shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 text-center font-medium min-w-[200px]">
+    Copied successfully!
+  </div>
+
+  <!-- Firebase Script SDK v9 (Modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDoSjEQFztfYwXDLLdqVy8OHwX-Fry_4JM",
+      authDomain: "com-13022.firebaseapp.com",
+      projectId: "com-13022",
+      storageBucket: "com-13022.firebasestorage.app",
+      messagingSenderId: "367500750991",
+      appId: "1:367500750991:web:385032eec44341ac4080fa",
+      measurementId: "G-YXYQ7VTFWW"
+    };
+
+    // Initialize Firebase, Analytics and Firestore
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // Dom Elements
+    const sectionAdd = document.getElementById('section-add');
+    const sectionHistory = document.getElementById('section-history');
+    const navAdd = document.getElementById('nav-add');
+    const navHistory = document.getElementById('nav-history');
+    const gmailForm = document.getElementById('gmail-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const accountsList = document.getElementById('accounts-list');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const searchBar = document.getElementById('search-bar');
+    const toast = document.getElementById('toast');
+
+    let allAccounts = []; // Local cache of accounts
+
+    // Show Toast Notification
+    function showToast(message) {
+      toast.innerText = message;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 3000);
+    }
+
+    // Copy to Clipboard Utility
+    window.copyText = function(text, type) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`📋 ${type} Copied!`);
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+    }
+
+    // Delete Account Utility
+    window.deleteAccount = async function(docId) {
+      if (confirm("Are you sure you want to delete this account?")) {
+        try {
+          await deleteDoc(doc(db, "gmails", docId));
+          showToast("🗑️ Account Deleted Successfully!");
+          loadAccounts(); // Refresh list
+        } catch (error) {
+          console.error("Error deleting document: ", error);
+          showToast("❌ Failed to Delete!");
+        }
+      }
+    }
+
+    // Navigation logic
+    navAdd.addEventListener('click', () => {
+      sectionAdd.classList.remove('hidden');
+      sectionHistory.classList.add('hidden');
+      navAdd.classList.add('bg-blue-700');
+      navHistory.classList.remove('bg-blue-700');
+      navHistory.classList.add('bg-blue-500');
+    });
+
+    navHistory.addEventListener('click', () => {
+      sectionAdd.classList.add('hidden');
+      sectionHistory.classList.remove('hidden');
+      navHistory.classList.add('bg-blue-700');
+      navAdd.classList.remove('bg-blue-700');
+      navAdd.classList.add('bg-blue-500');
+      loadAccounts();
+    });
+
+    // Save Gmail Data to Firebase Firestore with Duplicate Check
+    gmailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('acc-email').value.trim().toLowerCase();
+      const password = document.getElementById('acc-password').value.trim();
+      const recovery = document.getElementById('acc-recovery').value.trim() || 'N/A';
+      const phone = document.getElementById('acc-phone').value.trim() || 'N/A';
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Saving...";
+
+      try {
+        // Duplicate Check
+        const qCheck = query(collection(db, "gmails"), where("email", "==", email));
+        const querySnapshot = await getDocs(qCheck);
+        
+        if (!querySnapshot.empty) {
+          showToast("⚠️ This Email is already saved!");
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Save Account";
+          return;
+        }
+
+        // Save to Firestore
+        await addDoc(collection(db, "gmails"), {
+          email: email,
+          password: password,
+          recovery: recovery,
+          phone: phone,
+          createdAt: new Date()
+        });
+
+        showToast("✅ Account Saved Successfully!");
+        gmailForm.reset();
+      } catch (error) {
+        console.error("Error saving to db: ", error);
+        showToast("❌ Failed to Save!");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Save Account";
+      }
+    });
+
+    // Load Accounts from Firestore
+    async function loadAccounts() {
+      loadingSpinner.style.display = 'block';
+      accountsList.innerHTML = '';
+      
+      try {
+        const q = query(collection(db, "gmails"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        allAccounts = [];
+        
+        querySnapshot.forEach((doc) => {
+          allAccounts.push({ id: doc.id, ...doc.data() });
+        });
+
+        renderAccounts(allAccounts);
+      } catch (error) {
+        console.error("Error fetching accounts: ", error);
+        accountsList.innerHTML = `<p class="text-red-500 text-center">Error loading history.</p>`;
+      } finally {
+        loadingSpinner.style.display = 'none';
+      }
+    }
+
+    // Render Accounts List
+    function renderAccounts(accounts) {
+      accountsList.innerHTML = '';
+      if (accounts.length === 0) {
+        accountsList.innerHTML = `<p class="text-slate-400 text-center py-6">No accounts found.</p>`;
+        return;
+      }
+
+      accounts.forEach(acc => {
+        const accCard = document.createElement('div');
+        accCard.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-3 relative group";
+        accCard.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="text-slate-500 text-xs font-semibold uppercase">Gmail Address</h3>
+              <p class="font-semibold text-slate-800 text-base break-all">${acc.email}</p>
+            </div>
+            <button onclick="deleteAccount('${acc.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-xl transition text-xs font-semibold flex items-center gap-1 border border-red-100 bg-red-50/30">
+              🗑️ Delete
+            </button>
+          </div>
+          <div class="space-y-2 bg-slate-50 p-3 rounded-xl text-sm">
+            <div class="flex justify-between items-center gap-2">
+              <span class="text-slate-500 text-xs font-semibold uppercase shrink-0">Password</span>
+              <span class="font-mono font-medium text-slate-700 select-all break-all text-right">${acc.password}</span>
+            </div>
+            <div class="flex justify-between items-center gap-2">
+              <span class="text-slate-500 text-xs font-semibold uppercase shrink-0">Recovery</span>
+              <span class="font-medium text-slate-700 select-all break-all text-right text-xs">${acc.recovery}</span>
+            </div>
+            <div class="flex justify-between items-center gap-2">
+              <span class="text-slate-500 text-xs font-semibold uppercase shrink-0">Phone</span>
+              <span class="font-medium text-slate-700 select-all text-right text-xs">${acc.phone}</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mt-1">
+            <button onclick="copyText('${acc.email}', 'Email')" class="bg-blue-50 text-blue-600 font-semibold py-2 px-4 rounded-xl text-xs hover:bg-blue-100 active:scale-95 transition">
+              📋 Copy Email
+            </button>
+            <button onclick="copyText('${acc.password}', 'Password')" class="bg-emerald-50 text-emerald-600 font-semibold py-2 px-4 rounded-xl text-xs hover:bg-emerald-100 active:scale-95 transition">
+              🔑 Copy Password
+            </button>
+          </div>
+        `;
+        accountsList.appendChild(accCard);
+      });
+    }
+
+    // Realtime Search Filtering
+    searchBar.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allAccounts.filter(acc => 
+        acc.email.toLowerCase().includes(term) ||
+        (acc.recovery && acc.recovery.toLowerCase().includes(term))
+      );
+      renderAccounts(filtered);
+    });
+
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker Registered!', reg))
+          .catch(err => console.log('SW Registration Failed', err));
+      });
+    }
+  </script>
+</body>
+</html>
